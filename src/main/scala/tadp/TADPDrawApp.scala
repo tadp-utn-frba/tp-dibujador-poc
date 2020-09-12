@@ -5,8 +5,8 @@ import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.paint.Color._
 import scalafx.scene.paint._
-import scalafx.scene.{Group => FxGroup, Scene}
-import tadp.drawing.{Circle, Drawable, Group, Rectangle, Samples, ShapeProperties}
+import scalafx.scene.{Scene, Group => FxGroup}
+import tadp.drawing.{Circle, Drawable, Group, Rectangle, Samples, ShapeProperties, Triangle}
 
 object TADPDrawApp extends JFXApp {
   val canvas = new Canvas(800, 600)
@@ -36,6 +36,10 @@ object TADPDrawApp extends JFXApp {
         configureShapeProperties(properties)
         canvas.graphicsContext2D.fillOval(pos.x - radius, pos.y - radius, radius * 2, radius * 2)
         canvas.graphicsContext2D.strokeOval(pos.x - radius, pos.y - radius, radius * 2, radius * 2)
+      case Triangle(p1, p2, p3, properties) =>
+        configureShapeProperties(properties)
+        canvas.graphicsContext2D.fillPolygon(Seq(p1.tuple, p2.tuple, p3.tuple))
+        canvas.graphicsContext2D.strokePolygon(Seq(p1.tuple, p2.tuple, p3.tuple))
       case Group(position, children) =>
         val previousTransform = canvas.graphicsContext2D.getTransform()
         canvas.graphicsContext2D.translate(position.x, position.y)

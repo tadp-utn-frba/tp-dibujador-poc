@@ -1,0 +1,50 @@
+Imagen ::- Dibujable*
+
+Dibujable ::- Grupo | Triangulo | Circulo | Rectangulo
+
+Grupo ::- 'grupo' '{' Dibujable* '}'
+
+Punto ::- Number '@' Number
+
+Vertices3 ::- 'vertices' Punto ',' Punto ',' Punto
+
+Vertices2 ::- 'vertices' Punto ',' Punto
+
+Color ::- Number '@' Number '@' Number ('@' Number)?
+
+PropiedadTriangulo ::- Vertices3 | Color
+
+Triangulo ::- 'triangulo' '{' PropiedadTriangulo+ '}'
+
+PropiedadRectangulo ::- Vertices2 | Color
+
+Rectangulo ::- 'rectangulo' '{' PropiedadRectangulo+ '}'
+
+Radio ::- 'radio' Number
+
+PropiedadCirculo ::- Radio | Color
+
+Circulo ::- 'circulo' '{' PropiedadCirculo+ '}'
+
+
+-------------SEGUNDA ALTERNATIVA-------------
+
+Dibujo ::- Nodo*
+
+Nodo ::- Transformacion | Figura
+
+Hijos ::- '{' Nodo+ '}'
+
+Translacion ::- 'translacion' '[' Punto ']'
+
+Escala ::- 'escala' '[' Number ']'
+
+Rotacion ::- 'rotacion' '[' Number ']'
+
+Transformacion ::- (Translacion | Escala | Rotacion | Color) Hijos
+
+Triangulo ::- 'triangulo' '[' Punto ',' Punto ',' Punto ']'
+Rectangulo ::- 'rectangulo' '[' Punto ',' Punto ']'
+Circulo ::- 'circulo' '[' Punto ',' Number ']'
+
+Figura ::- Triangulo | Rectangulo | Circulo

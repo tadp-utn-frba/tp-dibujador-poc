@@ -1,0 +1,26 @@
+grupo {
+	triangulo {
+		vertices 1 @ 2, 2 @ 4, 0 @ 0
+		color 255 @ 0 @ 100 @ 255
+    }
+	rectangulo {
+		vertices 0 @ 0, 2 @ 4
+		color 255 @ 0 @ 100
+    }
+    circulo {
+        radio 3
+        color 255 @ 255 @ 0
+    }
+}
+
+------------SEGUNDA ALTERNATIVA-------------
+
+escala[3] {
+    translacion[20 @ 20] {
+        color[255 @ 0 @ 100 @ 255] {
+            triangulo[1 @ 2, 2 @ 4, 0 @ 0]
+            cuadrado[0 @ 0, 2 @ 4]
+            circulo[3 @ 3, 3]
+        }
+    }
+}
