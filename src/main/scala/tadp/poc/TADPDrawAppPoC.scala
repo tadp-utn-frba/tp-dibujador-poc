@@ -1,14 +1,15 @@
-package tadp
+package tadp.poc
 
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
+import scalafx.scene.Scene
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.paint.Color._
-import scalafx.scene.paint._
-import scalafx.scene.{Scene, Group => FxGroup}
-import tadp.drawing.{Circle, Drawable, Group, Rectangle, Samples, ShapeProperties, Triangle}
+import scalafx.scene.paint.Color
+import scalafx.scene.paint.Color.Transparent
+import scalafx.scene.{Group => FxGroup}
+import tadp.poc.drawing._
 
-object TADPDrawApp extends JFXApp {
+object TADPDrawAppPoC extends JFXApp {
   val canvas = new Canvas(800, 600)
   stage = new PrimaryStage {
     //    initStyle(StageStyle.Unified)

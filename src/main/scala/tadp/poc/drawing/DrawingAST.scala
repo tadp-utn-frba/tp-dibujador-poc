@@ -1,4 +1,4 @@
-package tadp.drawing
+package tadp.poc.drawing
 
 import scalafx.scene.paint.Color
 

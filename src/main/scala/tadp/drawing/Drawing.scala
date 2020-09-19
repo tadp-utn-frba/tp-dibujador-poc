@@ -1,26 +1,31 @@
 package tadp.drawing
 
-import scalafx.scene.paint.Paint
+import scalafx.scene.paint.Color
 
-trait Drawable
-
-case class Drawing(root: Drawable)
-
-case class Vector2D(x: Double, y: Double) {
-  def tuple: (Double, Double) = (x, y)
+object Drawing {
+  // Acá iría el código del alumno
+  def draw(adapter: TADPDrawingAdapter) = {
+    adapter
+      .beginTranslate(200, 75)
+        .beginScale(1.5)
+        .beginColor(Color.rgb(125,125,140))
+          .rectangle((0,0), (400,400))
+        .end()
+        .beginColor(Color.rgb(255,255,125))
+          .circle((100,100),50)
+          .circle((300,100),50)
+        .end()
+        .beginColor(Color.rgb(100,100,100))
+          .beginTranslate(200,200)
+            .beginRotate(45)
+              .rectangle((-20, -20), (20, 20))
+            .end()
+          .end()
+        .end()
+        .beginColor(Color.rgb(150,150,230))
+          .triangle((80, 300), (320, 300), (200, 350))
+        .end()
+      .end()
+    .end()
+  }
 }
-
-case class Group(position: Vector2D, children: Seq[Drawable]) extends Drawable
-
-case class Stroke(width: Double, paint: Paint)
-
-case class ShapeProperties(fill: Option[Paint], stroke: Option[Stroke])
-
-case class Rectangle(position: Vector2D, width: Double, height: Double, properties: ShapeProperties) extends Drawable
-
-case class Circle(center: Vector2D, radius: Double, properties: ShapeProperties) extends Drawable
-
-case class Triangle(p1: Vector2D, p2: Vector2D, p3: Vector2D, properties: ShapeProperties) extends Drawable
-
-
-
