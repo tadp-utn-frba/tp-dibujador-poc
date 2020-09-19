@@ -1,6 +1,7 @@
 package tadp.poc.drawing
 
 import scalafx.scene.paint.Color
+import scala.language.implicitConversions
 
 object Samples {
   implicit def tupleToVector[N1: Numeric, N2: Numeric](t: (N1, N2)): Vector2D = Vector2D(Numeric[N1].toDouble(t._1), Numeric[N2].toDouble(t._2))

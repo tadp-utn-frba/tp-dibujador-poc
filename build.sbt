@@ -12,6 +12,8 @@ libraryDependencies += "org.scalafx" %% "scalafx" % "14-R19"
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
+// set the main class for 'sbt run'
+mainClass in (Compile, run) := Some("tadp.drawing.TADPDrawingApp")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit", "-encoding", "utf8", "-feature")
 
