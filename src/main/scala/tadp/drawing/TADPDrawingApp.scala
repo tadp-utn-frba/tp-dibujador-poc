@@ -21,6 +21,6 @@ object TADPDrawingApp extends JFXApp {
   canvas.graphicsContext2D.fillRect(0, 0, canvas.width.value, canvas.height.value)
   canvas.graphicsContext2D.setFill(Color.White)
 
-  val adapter = new TADPDrawingAdapter(canvas)
+  val adapter = TADPDrawingAdapter(canvas)
   Drawing.draw(adapter)
 }
