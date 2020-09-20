@@ -8,7 +8,7 @@ object parser {
 
   def imagenVaciaParser : Parser[ImagenVacia.type] = emptyParser.map(_ => ImagenVacia)
 
-  def dibujableParser : Parser[Dibujable] = trianguloParser <|> rectanguloParser <|> grupoParser
+  def dibujableParser : Parser[Dibujable] = trianguloParser <|> rectanguloParser <|> grupoParser <|> colorParser
 
   def trianguloParser : Parser[Triangulo] = for {
     _ <- string("triangulo")
@@ -42,4 +42,21 @@ object parser {
     dibujables <-  (whitespace ~> dibujableParser).optSepBy(char(','))
     _ <- whitespace ~> char(')')
   } yield Grupo(dibujables)
+
+  def colorParser : Parser[Color] = for {
+    _ <- string("color[")
+    colorRGB <- colorRGBParser
+    _ <- char(']')
+    _ <- char('(')
+    dibujable <- whitespace ~> dibujableParser <~ whitespace
+    _ <- char(')')
+  } yield Color(colorRGB, dibujable)
+
+  def colorRGBParser : Parser[ColorRGB] = for {
+    r <- whitespace ~> integer <~ whitespace
+    _ <- char(',')
+    g <- whitespace ~> integer <~ whitespace
+    _ <- char(',')
+    b <- whitespace ~> integer <~ whitespace
+  } yield (r, g, b)
 }

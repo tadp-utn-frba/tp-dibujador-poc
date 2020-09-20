@@ -107,4 +107,20 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
       )
     )
   }
+
+  it should "parsear 'color[r, g, b]' con numeros en r, g y b seguido de un dibujable entre parentesis como una imagen con una transformacion de color que contiene ese dibujable" in {
+    val trianguloRojo =
+      """color[255, 0, 0](
+        | triangulo[0 @ 200, 300 @ 500, 400 @ 700]
+        |)""".stripMargin
+
+    imagenParser(trianguloRojo) should beSuccess(
+      ImagenCon(
+        Color(
+          (255, 0, 0),
+          Triangulo((0, 200), (300, 500), (400, 700))
+        )
+      )
+    )
+  }
 }

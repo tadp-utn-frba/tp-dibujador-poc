@@ -1,12 +1,12 @@
 package tadp.drawing
 
-import scalafx.scene.paint.Color
+import scalafx.scene.paint.{Color => C}
 import tadp.ast._
 
 object Dibujador {
   def reset(adapter: TADPDrawingAdapter): Unit = {
     adapter.
-      beginColor(Color.rgb(255,255,255)).
+      beginColor(C.rgb(255,255,255)).
       rectangle((0, 0), (1000, 1000))
       .end()
   }
@@ -22,13 +22,14 @@ object Dibujador {
         case Triangulo(p1, p2, p3) => adapter.triangle(p1, p2, p3)
         case Rectangulo(arribaIzquierda, abajoDerecha) => adapter.rectangle(arribaIzquierda, abajoDerecha)
         case Grupo(dibujables) => dibujables.foldLeft(adapter)((adapterPrevio, dibujable) => drawDibujable(adapterPrevio, dibujable))
+        case Color((r, g, b), dibujable) => drawDibujable(adapter.beginColor(C.rgb(r, g, b)), dibujable).end()
       }
     }
 
     imagen match {
       case ImagenVacia => adapter
       case ImagenCon(dibujable) => {
-        drawDibujable(adapter.beginColor(Color.rgb(125,125,140)), dibujable).end()
+        drawDibujable(adapter.beginColor(C.rgb(125,125,140)), dibujable).end()
       }
     }
   }
