@@ -17,13 +17,18 @@ object Dibujador {
   }
 
   def draw(adapter: TADPDrawingAdapter, imagen: Imagen) = {
+    def drawDibujable(adapter: TADPDrawingAdapter, dibujable: Dibujable): TADPDrawingAdapter = {
+      dibujable match {
+        case Triangulo(p1, p2, p3) => adapter.triangle(p1, p2, p3)
+        case Rectangulo(arribaIzquierda, abajoDerecha) => adapter.rectangle(arribaIzquierda, abajoDerecha)
+        case Grupo(dibujables) => dibujables.foldLeft(adapter)((adapterPrevio, dibujable) => drawDibujable(adapterPrevio, dibujable))
+      }
+    }
+
     imagen match {
       case ImagenVacia => adapter
-      case ImagenCon(figura) => {
-        figura match {
-          case Triangulo(p1, p2, p3) => adapter.beginColor(Color.rgb(125,125,140)).triangle(p1, p2, p3).end()
-          case Rectangulo(arribaIzquierda, abajoDerecha) => adapter.beginColor(Color.rgb(125,125,140)).rectangle(arribaIzquierda, abajoDerecha).end()
-        }
+      case ImagenCon(dibujable) => {
+        drawDibujable(adapter.beginColor(Color.rgb(125,125,140)), dibujable).end()
       }
     }
   }

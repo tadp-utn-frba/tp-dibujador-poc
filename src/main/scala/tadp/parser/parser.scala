@@ -4,11 +4,11 @@ import tadp.ast._
 import tadp.combinators._
 
 object parser {
-  def imagenParser : Parser[Imagen] = imagenVaciaParser <|> figuraParser.map(ImagenCon)
+  def imagenParser : Parser[Imagen] = imagenVaciaParser <|> dibujableParser.map(ImagenCon)
 
   def imagenVaciaParser : Parser[ImagenVacia.type] = emptyParser.map(_ => ImagenVacia)
 
-  def figuraParser : Parser[Figura] = trianguloParser <|> rectanguloParser
+  def dibujableParser : Parser[Dibujable] = trianguloParser <|> rectanguloParser <|> grupoParser
 
   def trianguloParser : Parser[Triangulo] = for {
     _ <- string("triangulo")
@@ -36,4 +36,10 @@ object parser {
       _ <- whitespace ~> char('@') <~ whitespace
       y <- float
     } yield (x, y)
+
+  def grupoParser : Parser[Grupo] = for {
+    _ <- string("grupo(")
+    dibujables <-  (whitespace ~> dibujableParser).optSepBy(char(','))
+    _ <- whitespace ~> char(')')
+  } yield Grupo(dibujables)
 }

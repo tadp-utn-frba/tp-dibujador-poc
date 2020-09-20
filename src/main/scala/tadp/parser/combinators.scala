@@ -30,6 +30,9 @@ object combinators {
       (for { firstValue <- this
              values <- (separatorParser ~> this ).* } yield firstValue :: values)
 
+    def optSepBy[U](separatorParser: Parser[U]) =
+      sepBy(separatorParser) <|> noop.map(_ => List())
+
     def satisfies(predicate: T => Boolean): Parser[T] = (text) =>
       this(text) match {
         case success@Success(value, _) if predicate(value) => success
@@ -81,7 +84,7 @@ object combinators {
   def emptyParser: Parser[Unit] = EmptyParser
   def anyChar: Parser[Char] = AnyChar
   def char: Char => Parser[Char] = aChar => anyChar satisfies (_ == aChar)
-  def whitespace: Parser[Unit] = (char(' ').*).map(_ => ())
+  def whitespace: Parser[Unit] = (anyChar.satisfies(_.isWhitespace).*).map(_ => ())
   def letter: Parser[Char] = anyChar satisfies (_.isLetter)
   def digit: Parser[Char] = anyChar satisfies (_.isDigit)
   def alphaNum: Parser[Char] = letter <|> digit

@@ -44,4 +44,67 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
                                                          abajoDerecha = (300, 300))
                                               ))
   }
+
+  it should "parsear 'grupo' seguido de parentesis y nada adentro devuelve una imagen con un grupo vacio" in {
+    val grupo = "grupo()"
+
+    imagenParser(grupo) should beSuccess(ImagenCon(Grupo(Seq())))
+  }
+
+  it should "parsear 'grupo' seguido de una figura entre parentesis como una imagen con un grupo que contiene esa figura" in {
+    val grupoConTriangulo = """grupo(
+                               triangulo[0 @ 100, 200 @ 300, 500 @ 200]
+                               )"""
+
+    imagenParser(grupoConTriangulo) should beSuccess(
+      ImagenCon(
+        Grupo(
+          Seq(Triangulo((0, 100), (200, 300), (500, 200)))
+        )
+      )
+    )
+  }
+
+  it should "parsear 'grupo' seguido de varias figuras separadas por coma entre parentesis como una imagen con un grupo que contiene todas esas figuras" in {
+    val grupoConRectanguloYTriangulo = """grupo(
+                               triangulo[0 @ 100, 100 @ 200, 200 @ 300],
+                               rectangulo[200 @ 300, 150 @ 500]
+                               )"""
+
+    imagenParser(grupoConRectanguloYTriangulo) should beSuccess(
+      ImagenCon(
+        Grupo(
+          Seq(
+            Triangulo((0, 100), (100, 200), (200, 300)),
+            Rectangulo((200, 300), (150, 500))
+          )
+        )
+      )
+    )
+  }
+
+  it should "parsear grupos anidados como grupos con grupos adentro" in {
+    val grupoConGrupo =
+      """grupo(
+        |  triangulo[0 @ 100, 100 @ 200, 200 @ 300],
+        |  grupo(
+        |    rectangulo[0 @ 100, 100 @ 200]
+        |  )
+        |)""".stripMargin
+
+    imagenParser(grupoConGrupo) should beSuccess(
+      ImagenCon(
+        Grupo(
+          Seq(
+            Triangulo((0, 100), (100, 200), (200, 300)),
+            Grupo(
+              Seq(
+                Rectangulo((0, 100), (100, 200))
+              )
+            )
+          )
+        )
+      )
+    )
+  }
 }
