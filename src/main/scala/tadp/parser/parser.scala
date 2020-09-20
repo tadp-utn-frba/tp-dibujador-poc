@@ -4,9 +4,11 @@ import tadp.ast._
 import tadp.combinators._
 
 object parser {
-  def imagenParser : Parser[Imagen] = imagenVaciaParser <|> trianguloParser.map(ImagenCon)
+  def imagenParser : Parser[Imagen] = imagenVaciaParser <|> figuraParser.map(ImagenCon)
 
   def imagenVaciaParser : Parser[ImagenVacia.type] = emptyParser.map(_ => ImagenVacia)
+
+  def figuraParser : Parser[Figura] = trianguloParser <|> rectanguloParser
 
   def trianguloParser : Parser[Triangulo] = for {
     _ <- string("triangulo")
@@ -18,6 +20,15 @@ object parser {
     p3 <- verticeParser <~ whitespace
     _ <- char(']')
     } yield Triangulo(p1 = p1, p2 = p2, p3 = p3)
+
+  def rectanguloParser : Parser[Rectangulo] = for {
+    _ <- string("rectangulo")
+    _ <- char('[') <~ whitespace
+    arribaIzquierda <- verticeParser <~ whitespace
+    _ <- char(',') <~ whitespace
+    abajoDerecha <- verticeParser <~ whitespace
+    _ <- char(']')
+  } yield Rectangulo(arribaIzquierda = arribaIzquierda, abajoDerecha = abajoDerecha)
 
   def verticeParser : Parser[Punto2D] =
     for {

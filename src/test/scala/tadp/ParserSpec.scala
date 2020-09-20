@@ -35,4 +35,13 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
 
     imagenParser(programaInvalido) should be(Error(leftToParse = programaInvalido))
   }
+
+  it should "parsear 'rectangulo' seguido de dos puntos entre corchetes a una imagen que contiene un rectangulo con esos puntos como superior izquierdo e inferior derecho" in {
+    val rectangulo = "rectangulo[100 @ 100, 300 @ 300]"
+
+    imagenParser(rectangulo) should beSuccess(ImagenCon(
+                                              Rectangulo(arribaIzquierda = (100, 100),
+                                                         abajoDerecha = (300, 300))
+                                              ))
+  }
 }

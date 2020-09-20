@@ -22,6 +22,7 @@ object Dibujador {
       case ImagenCon(figura) => {
         figura match {
           case Triangulo(p1, p2, p3) => adapter.beginColor(Color.rgb(125,125,140)).triangle(p1, p2, p3).end()
+          case Rectangulo(arribaIzquierda, abajoDerecha) => adapter.beginColor(Color.rgb(125,125,140)).rectangle(arribaIzquierda, abajoDerecha).end()
         }
       }
     }

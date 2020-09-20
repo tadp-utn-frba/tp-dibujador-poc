@@ -5,8 +5,10 @@ object ast {
 
   trait Imagen
 
-  case class ImagenCon(figura: Triangulo) extends Imagen
+  case class ImagenCon(figura: Figura) extends Imagen
   case object ImagenVacia extends Imagen
 
-  case class Triangulo(p1: Punto2D, p2: Punto2D, p3: Punto2D)
+  trait Figura
+  case class Triangulo(p1: Punto2D, p2: Punto2D, p3: Punto2D) extends Figura
+  case class Rectangulo(arribaIzquierda: Punto2D, abajoDerecha: Punto2D) extends Figura
 }
