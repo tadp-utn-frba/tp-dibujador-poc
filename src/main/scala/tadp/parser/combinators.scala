@@ -108,7 +108,10 @@ object combinators {
       decimalPart <- (decimals <|> floatingPoint.map(_ => 0: Double)).opt
     } yield integerPart + decimalPart.getOrElse(0: Double)
 
-    floatWithIntegerPart <|> decimals
+    for {
+      sign <- char('-').map { _ => (-1) } <|> noop.map { _ => 1 }
+      positiveNumber <- floatWithIntegerPart <|> decimals
+    } yield positiveNumber * sign
   }
   def noop: Parser[Unit] = NoopParser
 }
