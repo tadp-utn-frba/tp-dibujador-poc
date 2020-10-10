@@ -51,8 +51,32 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
 
     assertFactorComun(traslacion)
   }
-//
-//  it should "tomar una transformacion aplicada a algunos hijos de un grupo pero no todos y dejarlo igual" in {
-//    val traslacion =
-//  }
+
+  it should "tomar una transformacion aplicada a algunos hijos de un grupo pero no todos lo deja igual" in {
+    val unCirculo = Circulo(centro=(0,0), radio=1)
+    val unRectangulo = Rectangulo((0,0), (1,1))
+
+    val imagen = ImagenCon(
+      Grupo(Seq(
+        unCirculo,
+        Traslacion((200, 300), unRectangulo)
+      ))
+    )
+
+    simplificar(imagen) shouldBe(imagen)
+  }
+
+  it should "tomar un grupo donde cada hijo tiene aplicada una transformacion diferente lo deja igual" in {
+    val unCirculo = Circulo(centro=(0,0), radio=1)
+    val unRectangulo = Rectangulo((0,0), (1,1))
+
+    val imagen = ImagenCon(
+      Grupo(Seq(
+        Escala((100, 200), unCirculo),
+        Traslacion((200, 300), unRectangulo)
+      ))
+    )
+
+    simplificar(imagen) shouldBe(imagen)
+  }
 }

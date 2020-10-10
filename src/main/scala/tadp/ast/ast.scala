@@ -15,29 +15,62 @@ object ast {
   case class Circulo(centro: Punto2D, radio: Double) extends Dibujable
   case class Grupo(dibujables: Seq[Dibujable]) extends Dibujable
 
-  trait Transformacion extends Dibujable {
-    def dibujable: Dibujable
+  case class Transformacion(dibujable: Dibujable, tipoTransformacion: TipoTransformacion) extends Dibujable
+
+  trait TipoTransformacion
+
+  case class TransformacionDeColor(color: ColorRGB) extends TipoTransformacion
+  case class TransformacionDeEscala(escalado: (Double, Double)) extends TipoTransformacion
+  case class TransformacionDeRotacion(angulo: Double) extends TipoTransformacion
+  case class TransformacionDeTraslacion(traslacion: (Double, Double)) extends TipoTransformacion
+
+  object Color {
+    def apply(color: ColorRGB, dibujable: Dibujable) =
+      Transformacion(dibujable, TransformacionDeColor(color))
+    def unapply(transformacion: Transformacion) = transformacion match {
+      case Transformacion(dibujable, TransformacionDeColor(color)) => Some(color, dibujable)
+      case _ => None
+    }
   }
-
-  case class Color(color: ColorRGB, dibujable: Dibujable) extends Transformacion
-  case class Escala(escalado: (Double, Double), dibujable: Dibujable) extends Transformacion
-  case class Rotacion(angulo: Double, dibujable: Dibujable) extends Transformacion
-  case class Traslacion(traslacion: (Double, Double), dibujable: Dibujable) extends Transformacion
-
-  def esTransformacion(dibujable: Dibujable) = {
-    dibujable match {
-      case _ : Transformacion => true
-      case _ => false
+  object Rotacion {
+    def apply(angulo: Double, dibujable: Dibujable) =
+      Transformacion(dibujable, TransformacionDeRotacion(angulo))
+    def unapply(transformacion: Transformacion) = transformacion match {
+      case Transformacion(dibujable, TransformacionDeRotacion(angulo)) => Some(angulo, dibujable)
+      case _ => None
+    }
+  }
+  object Traslacion {
+    def apply(traslacion: (Double, Double), dibujable: Dibujable) =
+      Transformacion(dibujable, TransformacionDeTraslacion(traslacion))
+    def unapply(transformacion: Transformacion) = transformacion match {
+      case Transformacion(dibujable, TransformacionDeTraslacion(traslacion)) => Some(traslacion, dibujable)
+      case _ => None
+    }
+  }
+  object Escala {
+    def apply(escalado: (Double, Double), dibujable: Dibujable) =
+      Transformacion(dibujable, TransformacionDeEscala(escalado))
+    def unapply(transformacion: Transformacion) = transformacion match {
+      case Transformacion(dibujable, TransformacionDeEscala(escala)) => Some(escala, dibujable)
+      case _ => None
     }
   }
 
-  def sonMismaTransformacion(dibujables: Seq[Dibujable]) = {
-    dibujables.forall(esTransformacion) && dibujables.forall(dibujable => (dibujable, dibujables.head) match {
-      case (Color(color, _), Color(otroColor, _)) => color == otroColor
-      case (Escala(escalado, _), Escala(otroEscalado, _)) => escalado == otroEscalado
-      case (Rotacion(angulo, _), Rotacion(otroAngulo, _)) => angulo == otroAngulo
-      case (Traslacion(traslacion, _), Traslacion(otraTraslacion, _)) => traslacion == otraTraslacion
-    })
+  object GrupoConTransformaciones {
+    def dibujableATransformacion(dibujable: Dibujable) = dibujable match {
+      case Transformacion(unDibujable, tipoTransformacion) => Some(Transformacion(unDibujable, tipoTransformacion))
+      case _ => None
+    }
+
+    def unapply(grupo: Grupo): Option[Seq[Transformacion]] = grupo match {
+      case Grupo(dibujables) => dibujables.map(dibujableATransformacion).foldLeft(Some(Seq()): Option[Seq[Transformacion]]) {
+        case (Some(transformaciones), Some(transformacion)) => Some(transformaciones :+ transformacion)
+        case (_, None) => None
+        case (None, _) => None
+      }
+      case _ => None
+    }
   }
 
   def simplificar(imagen: Imagen): Imagen = {
@@ -50,12 +83,8 @@ object ast {
   def simplificarDibujable(dibujable: Dibujable): Dibujable = {
     dibujable match {
       case Color(_, colorInterno@Color(_, _)) => colorInterno
-      case Grupo(transformaciones: Seq[Transformacion]) if sonMismaTransformacion(transformaciones) => transformaciones.head match {
-        case Color(color, _) => Color(color, Grupo(transformaciones.map(_.dibujable)))
-        case Escala(escalado, _) => Escala(escalado, Grupo(transformaciones.map(_.dibujable)))
-        case Rotacion(angulo, _) => Rotacion(angulo, Grupo(transformaciones.map(_.dibujable)))
-        case Traslacion(traslacion, _) => Traslacion(traslacion, Grupo(transformaciones.map(_.dibujable)))
-        }
+      case GrupoConTransformaciones(transformaciones) if transformaciones.map(_.tipoTransformacion).toSet.size == 1 =>
+        transformaciones.head.copy(dibujable = Grupo(transformaciones.map(_.dibujable)))
       case otro => otro
     }
   }

@@ -56,7 +56,7 @@ object parser {
     _ <- whitespace ~> char(')')
   } yield Grupo(dibujables)
 
-  def colorParser : Parser[Color] = for {
+  def colorParser : Parser[Transformacion] = for {
     _ <- string("color[")
     colorRGB <- colorRGBParser
     _ <- char(']')
@@ -65,7 +65,7 @@ object parser {
     _ <- char(')')
   } yield Color(colorRGB, dibujable)
 
-  def escalaParser : Parser[Escala] = for {
+  def escalaParser : Parser[Transformacion] = for {
     _ <- string("escala[")
     escaladoEnX <- whitespace ~> float <~ whitespace
     _ <- char(',')
@@ -84,7 +84,7 @@ object parser {
     b <- whitespace ~> integer <~ whitespace
   } yield (r, g, b)
 
-  def rotacionParser : Parser[Rotacion] = for {
+  def rotacionParser : Parser[Transformacion] = for {
     _ <- string("rotacion[")
     angulo <- whitespace ~> float <~ whitespace
     _ <- char(']')
@@ -93,7 +93,7 @@ object parser {
     _ <- char(')')
   } yield Rotacion(angulo, dibujable)
 
-  def traslacionParser : Parser[Traslacion] = for {
+  def traslacionParser : Parser[Transformacion] = for {
     _ <- string("traslacion[")
     traslacionEnX <- whitespace ~> float <~ whitespace
     _ <- char(',')
