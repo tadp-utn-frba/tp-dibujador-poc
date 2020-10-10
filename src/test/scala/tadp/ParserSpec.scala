@@ -45,6 +45,16 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
                                               ))
   }
 
+  it should "parsear circulo con un centro y un radio a una imagen que contiene un circulo" in {
+    val circulo = "circulo[100 @ 100, 200]"
+
+    imagenParser(circulo) should beSuccess(
+      ImagenCon(
+        Circulo(centro = (100, 100), radio = 200)
+      )
+    )
+  }
+
   it should "parsear 'grupo' seguido de parentesis y nada adentro devuelve una imagen con un grupo vacio" in {
     val grupo = "grupo()"
 

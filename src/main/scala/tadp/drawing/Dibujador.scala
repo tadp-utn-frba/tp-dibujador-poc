@@ -20,6 +20,7 @@ object Dibujador {
     def drawDibujable(adapter: TADPDrawingAdapter, dibujable: Dibujable): TADPDrawingAdapter = {
       dibujable match {
         case Triangulo(p1, p2, p3) => adapter.triangle(p1, p2, p3)
+        case Circulo(centro, radio) => adapter.circle(centro, radio)
         case Rectangulo(arribaIzquierda, abajoDerecha) => adapter.rectangle(arribaIzquierda, abajoDerecha)
         case Grupo(dibujables) => dibujables.foldLeft(adapter)((adapterPrevio, dibujable) => drawDibujable(adapterPrevio, dibujable))
         case Color((r, g, b), dibujable) => drawDibujable(adapter.beginColor(C.rgb(r, g, b)), dibujable).end()
