@@ -8,7 +8,9 @@ object parser {
 
   def imagenVaciaParser : Parser[ImagenVacia.type] = emptyParser.map(_ => ImagenVacia)
 
-  def dibujableParser : Parser[Dibujable] = figuraParser <|> grupoParser <|> colorParser
+  def dibujableParser : Parser[Dibujable] = figuraParser <|> grupoParser <|> transformacionParser
+
+  def transformacionParser : Parser[Dibujable] = colorParser <|> escalaParser
 
   def figuraParser : Parser[Dibujable] = trianguloParser <|> rectanguloParser <|> circuloParser
 
@@ -62,6 +64,17 @@ object parser {
     dibujable <- whitespace ~> dibujableParser <~ whitespace
     _ <- char(')')
   } yield Color(colorRGB, dibujable)
+
+  def escalaParser : Parser[Escala] = for {
+    _ <- string("escala[")
+    escaladoEnX <- whitespace ~> float <~ whitespace
+    _ <- char(',')
+    escaladoEnY <- whitespace ~> float
+    _ <- char(']')
+    _ <- char('(')
+    dibujable <- whitespace ~> dibujableParser <~ whitespace
+    _ <- char(')')
+  } yield Escala((escaladoEnX, escaladoEnY), dibujable)
 
   def colorRGBParser : Parser[ColorRGB] = for {
     r <- whitespace ~> integer <~ whitespace

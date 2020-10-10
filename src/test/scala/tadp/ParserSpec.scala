@@ -133,4 +133,20 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
       )
     )
   }
+
+  it should "parsear escala con dos numeros decimales seguido de un dibujable entre parentes como una imagen con una escala aplicada a ese dibujable" in {
+    val rectanguloEscalado =
+      """escala[2.5, 2](
+        | rectangulo[100 @ 200, 200 @ 400]
+        |)""".stripMargin
+
+    imagenParser(rectanguloEscalado) should beSuccess(
+      ImagenCon(
+        Escala(
+          (2.5, 2),
+          Rectangulo((100, 200), (200, 400))
+        )
+      )
+    )
+  }
 }

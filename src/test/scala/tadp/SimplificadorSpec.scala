@@ -14,7 +14,7 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
     simplificar(ImagenCon(colorDeColor)) shouldBe (ImagenCon(colorInterno))
   }
 
-  it should "tomar una transformacion aplicada a todos los hijos de un grupo y aplicarla al grupo en su lugar" in {
+  it should "tomar una transformacion de color aplicada a todos los hijos de un grupo y aplicarla al grupo en su lugar" in {
     val transformacion = (dibujable: Dibujable) => Color(color = (255, 0, 0), dibujable = dibujable)
     val unCirculo = Circulo(centro=(0,0), radio=1)
     val unRectangulo = Rectangulo((0,0), (1,1))
@@ -27,5 +27,20 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
       ImagenCon(
         transformacion(Grupo(Seq(unCirculo, unRectangulo))))
     )
+  }
+
+  it should "tomar una transformacion de escalado aplicada a todos los hijos de un grupo y aplicarla al grupo en su lugar" in {
+    val transformacion = (dibujable: Dibujable) => Escala(escalado = (1.5, 2), dibujable = dibujable)
+    val unCirculo = Circulo(centro=(0,0), radio=1)
+    val unRectangulo = Rectangulo((0,0), (1,1))
+
+    simplificar(
+      ImagenCon(
+        Grupo(Seq(transformacion(unCirculo), transformacion(unRectangulo)))
+      )
+    ) shouldBe(
+      ImagenCon(
+        transformacion(Grupo(Seq(unCirculo, unRectangulo))))
+      )
   }
 }

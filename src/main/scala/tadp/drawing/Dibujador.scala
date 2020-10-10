@@ -24,6 +24,7 @@ object Dibujador {
         case Rectangulo(arribaIzquierda, abajoDerecha) => adapter.rectangle(arribaIzquierda, abajoDerecha)
         case Grupo(dibujables) => dibujables.foldLeft(adapter)((adapterPrevio, dibujable) => drawDibujable(adapterPrevio, dibujable))
         case Color((r, g, b), dibujable) => drawDibujable(adapter.beginColor(C.rgb(r, g, b)), dibujable).end()
+        case Escala((escalaEnX, escalaEnY), dibujable) => drawDibujable(adapter.beginScale(escalaEnX, escalaEnY), dibujable).end()
       }
     }
 
