@@ -22,6 +22,7 @@ object ast {
   case class Color(color: ColorRGB, dibujable: Dibujable) extends Transformacion
   case class Escala(escalado: (Double, Double), dibujable: Dibujable) extends Transformacion
   case class Rotacion(angulo: Double, dibujable: Dibujable) extends Transformacion
+  case class Traslacion(traslacion: (Double, Double), dibujable: Dibujable) extends Transformacion
 
   def esTransformacion(dibujable: Dibujable) = {
     dibujable match {
@@ -35,6 +36,7 @@ object ast {
       case (Color(color, _), Color(otroColor, _)) => color == otroColor
       case (Escala(escalado, _), Escala(otroEscalado, _)) => escalado == otroEscalado
       case (Rotacion(angulo, _), Rotacion(otroAngulo, _)) => angulo == otroAngulo
+      case (Traslacion(traslacion, _), Traslacion(otraTraslacion, _)) => traslacion == otraTraslacion
     })
   }
 
@@ -52,6 +54,7 @@ object ast {
         case Color(color, _) => Color(color, Grupo(transformaciones.map(_.dibujable)))
         case Escala(escalado, _) => Escala(escalado, Grupo(transformaciones.map(_.dibujable)))
         case Rotacion(angulo, _) => Rotacion(angulo, Grupo(transformaciones.map(_.dibujable)))
+        case Traslacion(traslacion, _) => Traslacion(traslacion, Grupo(transformaciones.map(_.dibujable)))
         }
       case otro => otro
     }

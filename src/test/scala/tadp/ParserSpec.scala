@@ -165,4 +165,20 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
       )
     )
   }
+
+  it should "parsear traslacion con una traslacion en X seguida de una traslacion en Y entre parentesis como una imagen con una traslacion aplicada a ese dibujable" in {
+    val rombo =
+      """traslacion[20, 30](
+        | rectangulo[500 @ 0, 600 @ 100]
+        |)""".stripMargin
+
+    imagenParser(rombo) should beSuccess(
+      ImagenCon(
+        Traslacion(
+          (20, 30),
+          Rectangulo((500, 0), (600, 100))
+        )
+      )
+    )
+  }
 }

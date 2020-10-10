@@ -10,7 +10,7 @@ object parser {
 
   def dibujableParser : Parser[Dibujable] = figuraParser <|> grupoParser <|> transformacionParser
 
-  def transformacionParser : Parser[Dibujable] = colorParser <|> escalaParser <|> rotacionParser
+  def transformacionParser : Parser[Dibujable] = colorParser <|> escalaParser <|> rotacionParser <|> traslacionParser
 
   def figuraParser : Parser[Dibujable] = trianguloParser <|> rectanguloParser <|> circuloParser
 
@@ -92,4 +92,15 @@ object parser {
     dibujable <- whitespace ~> dibujableParser <~ whitespace
     _ <- char(')')
   } yield Rotacion(angulo, dibujable)
+
+  def traslacionParser : Parser[Traslacion] = for {
+    _ <- string("traslacion[")
+    traslacionEnX <- whitespace ~> float <~ whitespace
+    _ <- char(',')
+    traslacionEnY <- whitespace ~> float
+    _ <- char(']')
+    _ <- char('(')
+    dibujable <- whitespace ~> dibujableParser <~ whitespace
+    _ <- char(')')
+  } yield Traslacion((traslacionEnX, traslacionEnY), dibujable)
 }

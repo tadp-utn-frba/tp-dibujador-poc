@@ -26,6 +26,7 @@ object Dibujador {
         case Color((r, g, b), dibujable) => drawDibujable(adapter.beginColor(C.rgb(r, g, b)), dibujable).end()
         case Escala((escalaEnX, escalaEnY), dibujable) => drawDibujable(adapter.beginScale(escalaEnX, escalaEnY), dibujable).end()
         case Rotacion(angulo, dibujable) => drawDibujable(adapter.beginRotate(angulo), dibujable).end()
+        case Traslacion((trasladoEnX, trasladoEnY), dibujable) => drawDibujable(adapter.beginTranslate(trasladoEnX, trasladoEnY), dibujable).end()
       }
     }
 
