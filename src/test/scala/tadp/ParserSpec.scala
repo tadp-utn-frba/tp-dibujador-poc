@@ -134,7 +134,7 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
     )
   }
 
-  it should "parsear escala con dos numeros decimales seguido de un dibujable entre parentes como una imagen con una escala aplicada a ese dibujable" in {
+  it should "parsear escala con dos numeros decimales seguido de un dibujable entre parentesis como una imagen con una escala aplicada a ese dibujable" in {
     val rectanguloEscalado =
       """escala[2.5, 2](
         | rectangulo[100 @ 200, 200 @ 400]
@@ -145,6 +145,22 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
         Escala(
           (2.5, 2),
           Rectangulo((100, 200), (200, 400))
+        )
+      )
+    )
+  }
+
+  it should "parsear rotacion con un angulo seguido de un dibujable entre parentesis como una imagen con una rotacion aplicada a ese dibujable" in {
+    val rombo =
+      """rotacion[45](
+        | rectangulo[500 @ 0, 600 @ 100]
+        |)""".stripMargin
+
+    imagenParser(rombo) should beSuccess(
+      ImagenCon(
+        Rotacion(
+          angulo=45,
+          Rectangulo((500, 0), (600, 100))
         )
       )
     )

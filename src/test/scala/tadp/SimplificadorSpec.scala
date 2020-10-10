@@ -43,4 +43,19 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
         transformacion(Grupo(Seq(unCirculo, unRectangulo))))
       )
   }
+
+  it should "tomar una transformacion de rotacion aplicada a todos los hijos de un grupo y aplicarla al grupo en su lugar" in {
+    val transformacion = (dibujable: Dibujable) => Rotacion(angulo = 1.5, dibujable = dibujable)
+    val unCirculo = Circulo(centro=(0,0), radio=1)
+    val unRectangulo = Rectangulo((0,0), (1,1))
+
+    simplificar(
+      ImagenCon(
+        Grupo(Seq(transformacion(unCirculo), transformacion(unRectangulo)))
+      )
+    ) shouldBe(
+      ImagenCon(
+        transformacion(Grupo(Seq(unCirculo, unRectangulo))))
+      )
+  }
 }

@@ -21,11 +21,11 @@ object ast {
 
   case class Color(color: ColorRGB, dibujable: Dibujable) extends Transformacion
   case class Escala(escalado: (Double, Double), dibujable: Dibujable) extends Transformacion
+  case class Rotacion(angulo: Double, dibujable: Dibujable) extends Transformacion
 
   def esTransformacion(dibujable: Dibujable) = {
     dibujable match {
-      case Color(_, _) => true
-      case Escala(_, _) => true
+      case _ : Transformacion => true
       case _ => false
     }
   }
@@ -34,6 +34,7 @@ object ast {
     dibujables.forall(esTransformacion) && dibujables.forall(dibujable => (dibujable, dibujables.head) match {
       case (Color(color, _), Color(otroColor, _)) => color == otroColor
       case (Escala(escalado, _), Escala(otroEscalado, _)) => escalado == otroEscalado
+      case (Rotacion(angulo, _), Rotacion(otroAngulo, _)) => angulo == otroAngulo
     })
   }
 
@@ -50,6 +51,7 @@ object ast {
       case Grupo(transformaciones: Seq[Transformacion]) if sonMismaTransformacion(transformaciones) => transformaciones.head match {
         case Color(color, _) => Color(color, Grupo(transformaciones.map(_.dibujable)))
         case Escala(escalado, _) => Escala(escalado, Grupo(transformaciones.map(_.dibujable)))
+        case Rotacion(angulo, _) => Rotacion(angulo, Grupo(transformaciones.map(_.dibujable)))
         }
       case otro => otro
     }
