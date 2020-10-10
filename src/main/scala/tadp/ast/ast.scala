@@ -15,4 +15,34 @@ object ast {
   case class Circulo(centro: Punto2D, radio: Double) extends Dibujable
   case class Grupo(dibujables: Seq[Dibujable]) extends Dibujable
   case class Color(color: ColorRGB, dibujable: Dibujable) extends Dibujable
+
+  def esTransformacion(dibujable: Dibujable) = {
+    dibujable match {
+      case Color(_, _) => true
+      case _ => false
+    }
+  }
+
+  def sonMismaTransformacion(dibujables: Seq[Dibujable]) = {
+    dibujables.forall(esTransformacion) && dibujables.forall(dibujable => (dibujable, dibujables.head) match {
+      case (Color(color, _), Color(otroColor, _)) => color == otroColor
+    })
+  }
+
+  def simplificar(imagen: Imagen): Imagen = {
+    imagen match {
+      case ImagenCon(dibujable) => ImagenCon(simplificarDibujable(dibujable))
+      case ImagenVacia => ImagenVacia
+    }
+  }
+
+  def simplificarDibujable(dibujable: Dibujable): Dibujable = {
+    dibujable match {
+      case Color(_, colorInterno@Color(_, _)) => colorInterno
+      case Grupo(transformaciones: Seq[Color]) if sonMismaTransformacion(transformaciones) => transformaciones.head match {
+        case Color(color, _) => Color(color, Grupo(transformaciones.map(_.dibujable)))
+        }
+      case otro => otro
+    }
+  }
 }
