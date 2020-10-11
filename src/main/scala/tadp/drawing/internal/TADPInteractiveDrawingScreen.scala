@@ -23,19 +23,24 @@ class TADPInteractiveDrawingScreen(dibujador: (String, TADPDrawingAdapter) => An
   val contentWidth = appWidth - paneSeparation * 2
   val contentHeight = appHeight - paneSeparation * 2
 
-  val canvas = new Canvas(contentWidth / 2, contentHeight - 60)
-
+  var canvas = new Canvas(contentWidth / 2, contentHeight - 60)
+  var adapter = TADPDrawingAdapter(canvas)
   val canvasPane = new HBox()
-  canvasPane.children = canvas
-  canvasPane.margin = Insets(0, 0, 0, paneSeparation)
-  canvasPane.maxHeight = canvas.height.value
-  canvasPane.border = new Border(new BorderStroke(Color.Gray,
-    BorderStrokeStyle.Solid,
-    new CornerRadii(0),
-    new BorderWidths(1)))
 
+  def setupCanvas() = {
+    canvas = new Canvas(contentWidth / 2, contentHeight - 60)
+    adapter = TADPDrawingAdapter(canvas)
+    canvasPane.children = canvas
+    canvasPane.margin = Insets(0, 0, 0, paneSeparation)
+    canvasPane.maxHeight = canvas.height.value
+    canvasPane.border = new Border(new BorderStroke(Color.Gray,
+      BorderStrokeStyle.Solid,
+      new CornerRadii(0),
+      new BorderWidths(1)))
+  }
 
-  val adapter = TADPDrawingAdapter(canvas)
+  setupCanvas()
+
   val textField = new TextArea() {
     prefWidth = contentWidth / 2 - paneSeparation
     maxHeight = canvas.height.value
@@ -89,6 +94,7 @@ class TADPInteractiveDrawingScreen(dibujador: (String, TADPDrawingAdapter) => An
   }
 
   def dibujar(callback: () => Unit = () => ()): Unit = {
+    setupCanvas()
     limpiarMensaje()
     val descripcionDeImagen = textField.text.getValue
 
