@@ -1,9 +1,8 @@
 package tadp
 
-import org.scalatest._
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
-import tadp.ast._
+import tadp.ast.{_}
 
 class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
 
@@ -11,14 +10,14 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
     val colorInterno = Color(color = (255, 0, 0), dibujable = Circulo((0, 0), 1))
     val colorDeColor = Color(color = (1, 1, 1), dibujable = colorInterno)
 
-    simplificar(ImagenCon(colorDeColor)) shouldBe (ImagenCon(colorInterno))
+    simplificador(ImagenCon(colorDeColor)) shouldBe (ImagenCon(colorInterno))
   }
 
   def assertFactorComun(transformacion: Dibujable => Transformacion): Unit = {
     val unCirculo = Circulo(centro=(0,0), radio=1)
     val unRectangulo = Rectangulo((0,0), (1,1))
 
-    simplificar(
+    simplificador(
       ImagenCon(
         Grupo(Seq(transformacion(unCirculo), transformacion(unRectangulo)))
       )
@@ -58,7 +57,7 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
     val rectangulo = Rectangulo((200, 200), (300, 300))
     val circulo = Circulo((200, 300), 500)
 
-    simplificar(ImagenCon(
+    simplificador(ImagenCon(
       conEscaladoInverso(
         Grupo(
           Seq(
@@ -88,7 +87,7 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
       ))
     )
 
-    simplificar(imagen) shouldBe(imagen)
+    simplificador(imagen) shouldBe(imagen)
   }
 
   it should "tomar un grupo donde cada hijo tiene aplicada una transformacion diferente lo deja igual" in {
@@ -102,11 +101,11 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
       ))
     )
 
-    simplificar(imagen) shouldBe(imagen)
+    simplificador(imagen) shouldBe(imagen)
   }
 
   it should "tomar un escalado que contiene a otro escalado y reemplazarlos por la union de los escalados" in {
-    simplificar(ImagenCon(
+    simplificador(ImagenCon(
       Escala((2, 3),
         Escala((3, 5),
           Rectangulo((100, 200), (200, 300))
@@ -120,7 +119,7 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "tomar una rotacion que contiene a otra rotacion y reemplazarla por la union de las rotaciones" in {
-    simplificar(ImagenCon(
+    simplificador(ImagenCon(
       Rotacion(300,
         Rotacion(10,
           Rectangulo((100, 200), (200, 300))
@@ -134,7 +133,7 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "tomar una traslacion que contiene a otra traslacion y reemplazarla por la union de las traslaciones" in {
-    simplificar(ImagenCon(
+    simplificador(ImagenCon(
       Traslacion((10, 20),
         Traslacion((50, 10),
           Rectangulo((100, 200), (200, 300))
@@ -148,7 +147,7 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "eliminar traslaciones de (0,0)" in {
-    simplificar(ImagenCon(
+    simplificador(ImagenCon(
       Traslacion((0, 0),
         Rectangulo((100, 200), (200, 300))
       )
@@ -158,7 +157,7 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "eliminar rotaciones de 0" in {
-    simplificar(ImagenCon(
+    simplificador(ImagenCon(
       Rotacion(0,
         Rectangulo((100, 200), (200, 300))
       )
@@ -168,7 +167,7 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "eliminar escalados de (1, 1)" in {
-    simplificar(ImagenCon(
+    simplificador(ImagenCon(
       Escala((1, 1),
         Rectangulo((100, 200), (200, 300))
       )
@@ -181,7 +180,7 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
     val rectangulo = Rectangulo((100, 200), (300, 400))
     val rectanguloConRotacionIdentidad = Rotacion(0, rectangulo)
 
-    simplificar(ImagenCon(
+    simplificador(ImagenCon(
       Escala((2,2), rectanguloConRotacionIdentidad))
     ) shouldBe(ImagenCon(
       Escala((2, 2), rectangulo)
@@ -194,7 +193,7 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
     val conRotacionIdentidad = Rotacion(0, _)
     val conEscaladoIdentidad = Escala((1, 1), _)
 
-    simplificar(ImagenCon(
+    simplificador(ImagenCon(
       Grupo(Seq(
         conRotacionIdentidad(rectangulo),
         conEscaladoIdentidad(circulo))))
@@ -210,7 +209,7 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
     val conRotacionIdentidad = Rotacion(0, _)
     val conEscaladoIdentidad = Escala((1, 1), _)
 
-    simplificar(ImagenCon(
+    simplificador(ImagenCon(
       conEscaladoIdentidad(
         conRotacionIdentidad(
           rectangulo
