@@ -1,7 +1,7 @@
 package tadp
 
 import tadp.ast._
-import tadp.combinators._
+import tadp.combinators.{char, _}
 
 object parser {
   def imagenParser : Parser[Imagen] = imagenVaciaParser <|> dibujableParser.map(ImagenCon)
@@ -14,93 +14,92 @@ object parser {
 
   def figuraParser : Parser[Dibujable] = trianguloParser <|> rectanguloParser <|> circuloParser
 
-  def trianguloParser : Parser[Triangulo] = for {
-    _ <- string("triangulo")
-    _ <- char('[') <~ whitespace
-    p1 <- puntoParser <~ whitespace
-    _ <- char(',') <~ whitespace
-    p2 <- puntoParser <~ whitespace
-    _ <- char(',') <~ whitespace
-    p3 <- puntoParser <~ whitespace
-    _ <- char(']')
-    } yield Triangulo(p1 = p1, p2 = p2, p3 = p3)
+  def transformacion[A, B <: Transformacion](nombre : String,
+                                             parametrosParser : Parser[A],
+                                             crearTransformacion : (A, Dibujable) => B) = for {
+    _ <- string(nombre)
+    parametros <- entre("[", "]")(parametrosParser)
+    dibujable <- entre("(", ")")(dibujableParser)
+  } yield crearTransformacion(parametros, dibujable)
 
-  def rectanguloParser : Parser[Rectangulo] = for {
-    _ <- string("rectangulo")
-    _ <- char('[') <~ whitespace
-    arribaIzquierda <- puntoParser <~ whitespace
-    _ <- char(',') <~ whitespace
-    abajoDerecha <- puntoParser <~ whitespace
-    _ <- char(']')
-  } yield Rectangulo(arribaIzquierda = arribaIzquierda, abajoDerecha = abajoDerecha)
+  def entre[A](inicio: String, fin: String)(parser: Parser[A]) = for {
+    _ <- string(inicio)
+    resultado <- whitespace ~> parser <~ whitespace
+    _ <- string(fin)
+  } yield resultado
 
-  def circuloParser : Parser[Circulo] = for {
-    _ <- string("circulo")
-    _ <- char('[') <~ whitespace
-    centro <- puntoParser <~ whitespace
-    _ <- char(',') <~ whitespace
-    radio <- float <~ whitespace
-    _ <- char(']')
-  } yield Circulo(centro = centro, radio = radio)
+  def separador(sep: String) = whitespace ~> string(sep) <~ whitespace
+
+  def trianguloParser : Parser[Triangulo] =
+    string("triangulo") ~> entre("[", "]")(for {
+      p1 <- puntoParser
+      _ <- separador(",")
+      p2 <- puntoParser
+      _ <- separador(",")
+      p3 <- puntoParser
+    } yield Triangulo(p1, p2, p3))
+
+  def rectanguloParser : Parser[Rectangulo] =
+    string("rectangulo") ~> entre("[", "]")(for {
+      arribaIzquierda <- puntoParser
+      _ <- separador(",")
+      abajoDerecha <- puntoParser
+    } yield Rectangulo(arribaIzquierda, abajoDerecha))
+
+  def circuloParser : Parser[Circulo] =
+    string("circulo") ~> entre("[", "]")(for {
+      centro <- puntoParser
+      _ <- separador(",")
+      radio <- float
+    } yield Circulo(centro, radio))
 
   def puntoParser : Parser[Punto2D] =
     for {
       x <- float
-      _ <- whitespace ~> char('@') <~ whitespace
+      _ <- separador("@")
       y <- float
     } yield (x, y)
 
   def grupoParser : Parser[Grupo] = for {
-    _ <- string("grupo(")
-    dibujables <-  (whitespace ~> dibujableParser).optSepBy(char(','))
-    _ <- whitespace ~> char(')')
+    _ <- string("grupo")
+    dibujables <- entre("(", ")")(dibujableParser.optSepBy(separador(",")))
   } yield Grupo(dibujables)
 
-  def colorParser : Parser[Transformacion] = for {
-    _ <- string("color[")
-    colorRGB <- colorRGBParser
-    _ <- char(']')
-    _ <- char('(')
-    dibujable <- whitespace ~> dibujableParser <~ whitespace
-    _ <- char(')')
-  } yield Color(colorRGB, dibujable)
+  def colorParser : Parser[Transformacion] = {
+    val colorRGBParser = for {
+      r <- integer
+      _ <- separador(",")
+      g <- integer
+      _ <- separador(",")
+      b <- integer
+    } yield (r, g, b)
 
-  def escalaParser : Parser[Transformacion] = for {
-    _ <- string("escala[")
-    escaladoEnX <- whitespace ~> float <~ whitespace
-    _ <- char(',')
-    escaladoEnY <- whitespace ~> float
-    _ <- char(']')
-    _ <- char('(')
-    dibujable <- whitespace ~> dibujableParser <~ whitespace
-    _ <- char(')')
-  } yield Escala((escaladoEnX, escaladoEnY), dibujable)
+    transformacion("color", colorRGBParser, Color(_, _))
+  }
 
-  def colorRGBParser : Parser[ColorRGB] = for {
-    r <- whitespace ~> integer <~ whitespace
-    _ <- char(',')
-    g <- whitespace ~> integer <~ whitespace
-    _ <- char(',')
-    b <- whitespace ~> integer <~ whitespace
-  } yield (r, g, b)
+  def escalaParser : Parser[Transformacion] = {
+    val escaladoParser = for {
+      x <- float
+      _ <- separador(",")
+      y <- float
+    } yield (x, y)
 
-  def rotacionParser : Parser[Transformacion] = for {
-    _ <- string("rotacion[")
-    angulo <- whitespace ~> float <~ whitespace
-    _ <- char(']')
-    _ <- char('(')
-    dibujable <- whitespace ~> dibujableParser <~ whitespace
-    _ <- char(')')
-  } yield Rotacion(angulo, dibujable)
+    transformacion("escala", escaladoParser, Escala(_, _))
+  }
 
-  def traslacionParser : Parser[Transformacion] = for {
-    _ <- string("traslacion[")
-    traslacionEnX <- whitespace ~> float <~ whitespace
-    _ <- char(',')
-    traslacionEnY <- whitespace ~> float
-    _ <- char(']')
-    _ <- char('(')
-    dibujable <- whitespace ~> dibujableParser <~ whitespace
-    _ <- char(')')
-  } yield Traslacion((traslacionEnX, traslacionEnY), dibujable)
+  def rotacionParser : Parser[Transformacion] = {
+    val anguloParser = float
+
+    transformacion("rotacion", anguloParser, Rotacion(_, _))
+  }
+
+  def traslacionParser : Parser[Transformacion] = {
+    val trasladoParser = for {
+      x <- float
+      _ <- separador(",")
+      y <- float
+    } yield (x, y)
+
+    transformacion("traslacion", trasladoParser, Traslacion(_, _))
+  }
 }
