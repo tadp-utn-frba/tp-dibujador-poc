@@ -12,7 +12,7 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit", "-encoding", "utf8", "-feature")
 
 // set the main class for 'sbt run'
-mainClass in(Compile, run) := Some("tadp.drawing.TADPDrawingApp")
+mainClass in(Compile, run) := Some("tadp.drawing.internal.TADPDrawingApp")
 
 // Determine OS version of JavaFX binariess
 lazy val osName = System.getProperty("os.name") match {

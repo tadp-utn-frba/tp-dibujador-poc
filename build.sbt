@@ -1,26 +1,20 @@
-// Name of the project
-name := "TADP Draw PoC"
+name := "TADP Draw TP"
 
-// Project version
 version := "1.0.0"
 
-// Version of Scala used by the project
+organization := "edu.ar.utn.tadp"
+
 scalaVersion := "2.13.2"
 
-// Add dependency on ScalaFX library
-libraryDependencies += "org.scalafx" %% "scalafx" % "14-R19"
-
+resolvers += "Artima Maven Repository" at "https://repo.artima.com/releases"
 resolvers += Resolver.sonatypeRepo("snapshots")
-
-// set the main class for 'sbt run'
-mainClass in (Compile, run) := Some("tadp.drawing.TADPDrawingApp")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit", "-encoding", "utf8", "-feature")
 
-// Fork a new JVM for 'run' and 'test:run', to avoid JavaFX double initialization problems
-fork := true
+// set the main class for 'sbt run'
+mainClass in(Compile, run) := Some("tadp.drawing.internal.TADPDrawingApp")
 
-// Determine OS version of JavaFX binaries
+// Determine OS version of JavaFX binariess
 lazy val osName = System.getProperty("os.name") match {
   case n if n.startsWith("Linux") => "linux"
   case n if n.startsWith("Mac") => "mac"
@@ -28,16 +22,17 @@ lazy val osName = System.getProperty("os.name") match {
   case _ => throw new Exception("Unknown platform!")
 }
 
+libraryDependencies ++= Seq(
+  "org.scalatest" %% "scalatest" % "3.2.0" % "test",
+  "org.scalactic" %% "scalactic" % "3.2.0",
+  "org.scalafx" %% "scalafx" % "14-R19"
+)
+
 // Add JavaFX dependencies
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
-libraryDependencies ++= javaFXModules.map( m=>
+libraryDependencies ++= javaFXModules.map(m =>
   "org.openjfx" % s"javafx-$m" % "14.0.1" classifier osName
 )
 
-//ScalaTest
-
-resolvers += "Artima Maven Repository" at "https://repo.artima.com/releases"
-
-libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.0"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"
-
+// Fork a new JVM for 'run' and 'test:run', to avoid JavaFX double initialization problems
+fork := true
