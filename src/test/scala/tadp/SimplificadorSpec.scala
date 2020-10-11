@@ -52,6 +52,31 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
     assertFactorComun(traslacion)
   }
 
+  it should "si tras sacar factor comun de las simplificaciones de un grupo, queda otra estructura tambien simplificable se simplifica" in {
+    val conEscalado = Escala((2, 2), _)
+    val conEscaladoInverso = Escala((0.5, 0.5), _)
+    val rectangulo = Rectangulo((200, 200), (300, 300))
+    val circulo = Circulo((200, 300), 500)
+
+    simplificar(ImagenCon(
+      conEscaladoInverso(
+        Grupo(
+          Seq(
+            conEscalado(rectangulo),
+            conEscalado(circulo)
+          )
+        )
+      )
+    )) shouldBe(ImagenCon(
+      Grupo(
+        Seq(
+          rectangulo,
+          circulo
+        )
+      )
+    ))
+  }
+
   it should "tomar una transformacion aplicada a algunos hijos de un grupo pero no todos lo deja igual" in {
     val unCirculo = Circulo(centro=(0,0), radio=1)
     val unRectangulo = Rectangulo((0,0), (1,1))
@@ -78,5 +103,123 @@ class SimplificadorSpec extends AnyFlatSpec with should.Matchers {
     )
 
     simplificar(imagen) shouldBe(imagen)
+  }
+
+  it should "tomar un escalado que contiene a otro escalado y reemplazarlos por la union de los escalados" in {
+    simplificar(ImagenCon(
+      Escala((2, 3),
+        Escala((3, 5),
+          Rectangulo((100, 200), (200, 300))
+        )
+      )
+    )) shouldBe(ImagenCon(
+      Escala((6, 15),
+        Rectangulo((100, 200), (200, 300))
+      )
+    ))
+  }
+
+  it should "tomar una rotacion que contiene a otra rotacion y reemplazarla por la union de las rotaciones" in {
+    simplificar(ImagenCon(
+      Rotacion(300,
+        Rotacion(10,
+          Rectangulo((100, 200), (200, 300))
+        )
+      )
+    )) shouldBe(ImagenCon(
+      Rotacion(310,
+        Rectangulo((100, 200), (200, 300))
+      )
+    ))
+  }
+
+  it should "tomar una traslacion que contiene a otra traslacion y reemplazarla por la union de las traslaciones" in {
+    simplificar(ImagenCon(
+      Traslacion((10, 20),
+        Traslacion((50, 10),
+          Rectangulo((100, 200), (200, 300))
+        )
+      )
+    )) shouldBe(ImagenCon(
+      Traslacion((60, 30),
+        Rectangulo((100, 200), (200, 300))
+      )
+    ))
+  }
+
+  it should "eliminar traslaciones de (0,0)" in {
+    simplificar(ImagenCon(
+      Traslacion((0, 0),
+        Rectangulo((100, 200), (200, 300))
+      )
+    )) shouldBe(ImagenCon(
+      Rectangulo((100, 200), (200, 300))
+    ))
+  }
+
+  it should "eliminar rotaciones de 0" in {
+    simplificar(ImagenCon(
+      Rotacion(0,
+        Rectangulo((100, 200), (200, 300))
+      )
+    )) shouldBe(ImagenCon(
+      Rectangulo((100, 200), (200, 300))
+    ))
+  }
+
+  it should "eliminar escalados de (1, 1)" in {
+    simplificar(ImagenCon(
+      Escala((1, 1),
+        Rectangulo((100, 200), (200, 300))
+      )
+    )) shouldBe(ImagenCon(
+      Rectangulo((100, 200), (200, 300))
+    ))
+  }
+
+  it should "aplicar las simplificaciones aun si están anidadas en una transformacion que no se simplifica" in {
+    val rectangulo = Rectangulo((100, 200), (300, 400))
+    val rectanguloConRotacionIdentidad = Rotacion(0, rectangulo)
+
+    simplificar(ImagenCon(
+      Escala((2,2), rectanguloConRotacionIdentidad))
+    ) shouldBe(ImagenCon(
+      Escala((2, 2), rectangulo)
+    ))
+  }
+
+  it should "aplicar las simplificaciones aun si están anidadas en un grupo que no se simplifica" in {
+    val rectangulo = Rectangulo((100, 200), (300, 400))
+    val circulo = Circulo((100, 200), 300)
+    val conRotacionIdentidad = Rotacion(0, _)
+    val conEscaladoIdentidad = Escala((1, 1), _)
+
+    simplificar(ImagenCon(
+      Grupo(Seq(
+        conRotacionIdentidad(rectangulo),
+        conEscaladoIdentidad(circulo))))
+    ) shouldBe(ImagenCon(
+      Grupo(Seq(
+        rectangulo,
+        circulo))
+    ))
+  }
+
+  it should "aplicar las simplificaciones aun si están anidadas en otra estructura que tambien se simplifica" in {
+    val rectangulo = Rectangulo((100, 200), (300, 400))
+    val conRotacionIdentidad = Rotacion(0, _)
+    val conEscaladoIdentidad = Escala((1, 1), _)
+
+    simplificar(ImagenCon(
+      conEscaladoIdentidad(
+        conRotacionIdentidad(
+          rectangulo
+        )
+      )
+    )) shouldBe(
+      ImagenCon(
+        rectangulo
+      )
+    )
   }
 }
