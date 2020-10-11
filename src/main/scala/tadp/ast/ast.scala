@@ -34,7 +34,7 @@ object ast {
   }
   object Rotacion {
     def apply(angulo: Double, dibujable: Dibujable) =
-      Transformacion(dibujable, TransformacionDeRotacion(angulo))
+      Transformacion(dibujable, TransformacionDeRotacion(angulo % 360))
     def unapply(transformacion: Transformacion) = transformacion match {
       case Transformacion(dibujable, TransformacionDeRotacion(angulo)) => Some(angulo, dibujable)
       case _ => None

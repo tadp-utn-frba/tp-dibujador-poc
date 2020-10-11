@@ -166,6 +166,19 @@ class ParserSpec extends AnyFlatSpec with should.Matchers {
     )
   }
 
+  it should "parsear una rotacion de 360 o mas la convierte en una rotacion equivalente de menos de 360" in {
+    val rombo = "rotacion[405](rectangulo[500 @ 0, 600 @ 100])"
+
+    imagenParser(rombo) should beSuccess(
+      ImagenCon(
+        Rotacion(
+          angulo=45,
+          Rectangulo((500, 0), (600, 100))
+        )
+      )
+    )
+  }
+
   it should "parsear traslacion con una traslacion en X seguida de una traslacion en Y entre parentesis como una imagen con una traslacion aplicada a ese dibujable" in {
     val rombo =
       """traslacion[20, 30](
