@@ -5,7 +5,7 @@ name := "TADP Draw PoC"
 version := "1.0.0"
 
 // Version of Scala used by the project
-scalaVersion := "2.13.2"
+scalaVersion := "2.13.11"
 
 // Add dependency on ScalaFX library
 libraryDependencies += "org.scalafx" %% "scalafx" % "14-R19"

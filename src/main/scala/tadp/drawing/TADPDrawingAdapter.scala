@@ -59,7 +59,7 @@ case class TADPDrawingAdapter(canvas: Canvas, appliedOperations: List[RevertOper
 
 object Operations {
 
-  type RevertOperation = () => ()
+  type RevertOperation = () => Unit
 
   // Una operación es una función que se aplica sobre un contexto,
   // y me devuelve la función que tengo que llamar para revertirla
