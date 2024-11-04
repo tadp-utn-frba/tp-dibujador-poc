@@ -83,3 +83,20 @@ object Operations {
     () => context.setFill(previousPaint)
   }
 }
+
+object TADPDrawingAdapter {
+  def forScreen(instructions: TADPDrawingAdapter => Any): Unit = {
+    val screenApp = new TADPDrawingScreen(instructions)
+    screenApp.main(Array())
+  }
+
+  def forImage(name: String)(instructions: TADPDrawingAdapter => Any): Unit = {
+    val screenApp = new TADPDrawingScreen(instructions, Some(name))
+    screenApp.main(Array())
+  }
+
+  def forInteractiveScreen(interpreter: (String, TADPDrawingAdapter) => Any): Unit = {
+    val screenApp = new TADPInteractiveDrawingScreen(interpreter)
+    screenApp.main(Array())
+  }
+}

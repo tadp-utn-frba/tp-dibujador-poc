@@ -25,4 +25,5 @@ object TADPDrawingApp extends JFXApp3 {
     val adapter = TADPDrawingAdapter(canvas)
     Drawing.draw(adapter)
   }
+
 }
